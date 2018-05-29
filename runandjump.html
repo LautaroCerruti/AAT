@@ -32,15 +32,39 @@
         }
     };
     
-    /*class Nene {
-            var player;
+    class Nene {
+           constructor(player){
+               this.player = player;
+           }
+           corrizq (value){
+               if(value){
+                this.player.setVelocityX(-160);
+                this.player.anims.play('left', true);
+               }
+           }
+           corrder (value){
+               if(value){
+                this.player.setVelocityX(160);
+                this.player.anims.play('right', true);
+               }
+           }
+           saltar(value,value2){
+               if(value && value2){this.player.setVelocityY(-330);}
+           }
+           idle(value,value2){
+            if(!(value || value2)) {
+                this.player.setVelocityX(0);
+                this.player.anims.play('turn');
+            }
+           }
     }
-
-    var jugador = new Nene();*/
+    /*
+    var jugador = new Nene();
+    */
     var player;
     var platforms;
     var cursors;
-
+    let jugador = new Nene(player);
     var game = new Phaser.Game(config);
 
     function preload ()
@@ -58,10 +82,10 @@
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        player = this.physics.add.sprite(500, 450, 'dude');
+        jugador.player = this.physics.add.sprite(500, 450, 'dude');
 
-        player.setBounce(0.2);
-        player.setCollideWorldBounds(true);
+        jugador.player.setBounce(0.2);
+        jugador.player.setCollideWorldBounds(true);
 
         this.anims.create({
             key: 'left',
@@ -85,35 +109,15 @@
 
         cursors = this.input.keyboard.createCursorKeys();
 
-        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(jugador.player, platforms);
 
     }
     function update ()
     {
-        if (cursors.left.isDown)
-        {
-            player.setVelocityX(-160);
-
-            player.anims.play('left', true);
-        }
-        else if (cursors.right.isDown)
-        {
-            player.setVelocityX(160);
-
-            player.anims.play('right', true);
-        }
-        else
-        {
-            player.setVelocityX(0);
-
-            player.anims.play('turn');
-        }
-
-        if (cursors.up.isDown && player.body.touching.down)
-        {
-            player.setVelocityY(-330);
-        }
-        
+        jugador.corrizq(cursors.left.isDown);
+        jugador.corrder(cursors.right.isDown);
+        jugador.saltar(cursors.up.isDown,jugador.player.body.touching.down);
+        jugador.idle(cursors.left.isDown,cursors.right.isDown);
     }
 </script>
 
