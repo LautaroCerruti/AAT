@@ -33,8 +33,9 @@
     };
     
     class Nene {
-           constructor(player){
-               this.player = player;
+           constructor(){
+                this.player;
+                this.dbljmp=0;
            }
            corrizq (value){
                if(value){
@@ -48,8 +49,16 @@
                 this.player.anims.play('right', true);
                }
            }
-           saltar(value,value2){
-               if(value && value2){this.player.setVelocityY(-330);}
+           saltar(salto,touchingd){
+               if(salto){
+                if(touchingd){
+                    this.player.setVelocityY(-250);
+                    this.dbljmp=1;
+                    } else if((this.player.body.velocity.y>-180) && this.dbljmp){
+                        this.player.setVelocityY(-250);
+                        this.dbljmp = 0;
+                    }
+               }
            }
            idle(value,value2){
             if(!(value || value2)) {
@@ -57,14 +66,15 @@
                 this.player.anims.play('turn');
             }
            }
+           parametros(sprite,bounce){
+            jugador.player=sprite;
+            jugador.player.setBounce(bounce);
+            jugador.player.setCollideWorldBounds(true);
+           }
     }
-    /*
-    var jugador = new Nene();
-    */
-    var player;
     var platforms;
     var cursors;
-    let jugador = new Nene(player);
+    let jugador = new Nene();
     var game = new Phaser.Game(config);
 
     function preload ()
@@ -82,10 +92,7 @@
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        jugador.player = this.physics.add.sprite(500, 450, 'dude');
-
-        jugador.player.setBounce(0.2);
-        jugador.player.setCollideWorldBounds(true);
+        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.2);
 
         this.anims.create({
             key: 'left',
