@@ -48,7 +48,8 @@
                     else this.player.body.velocity.x=this.player.body.velocity.x-3;
                 }
                 if(touchg) this.player.anims.play('left', true);
-                else this.player.anims.play('caidai', true);
+                else if(this.player.body.velocity.y>=0) this.player.anims.play('caidai', true);
+                    else this.player.anims.play('saltoi', true);
                }
            }
            corrder (value,touchg){
@@ -61,7 +62,8 @@
                     else this.player.body.velocity.x=this.player.body.velocity.x+3;
                 }
                 if(touchg) this.player.anims.play('right', true);
-                else this.player.anims.play('caidad', true);
+                else if(this.player.body.velocity.y>=0) this.player.anims.play('caidad', true);
+                    else this.player.anims.play('saltod', true);
                }
            }
            saltar(salto,touchingd){
@@ -88,7 +90,6 @@
                     this.banim=true;
                     }
             if(touchg) {
-                //COPIAR LO DE ABAJO CON LAS DE FRENADO, BORRAR LA DEL TURN
                 if(!(this.player.body.velocity.x)){
                     this.player.anims.play('turn');
                 } else {
@@ -96,10 +97,13 @@
                     else this.player.anims.play('frenadad', true);
                 }
             }
-            else if(this.banim){
-                this.player.anims.play('caidai', true);
-            }
-            else this.player.anims.play('caidad', true);
+            else
+                if(this.banim){
+                    if(this.player.body.velocity.y>=0) this.player.anims.play('caidai', true);
+                        else this.player.anims.play('saltoi', true);            }
+            else 
+                if(this.player.body.velocity.y>=0) this.player.anims.play('caidad', true);
+                    else this.player.anims.play('saltod', true);
            }
            }
            parametros(sprite,bounce){
@@ -164,13 +168,25 @@
 
         this.anims.create({
             key: 'frenadai',
-            frames: [ { key: 'dude', frame: 14 } ],
+            frames: [ { key: 'dude', frame: 16 } ],
             frameRate: 20
         });
 
         this.anims.create({
             key: 'frenadad',
-            frames: [ { key: 'dude', frame: 13 } ],
+            frames: [ { key: 'dude', frame: 15 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'saltod',
+            frames: [ { key: 'dude', frame: 17 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'saltoi',
+            frames: [ { key: 'dude', frame: 18 } ],
             frameRate: 20
         });
 
