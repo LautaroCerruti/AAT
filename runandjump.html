@@ -36,8 +36,9 @@
            constructor(){
                 this.player;
                 this.dbljmp=0;
+                this.banim=false;
            }
-           corrizq (value){
+           corrizq (value,touchg){
                if(value){
                 //this.player.setVelocityX(-160);
                 if(this.player.body.velocity.x>-400) {
@@ -46,10 +47,11 @@
                     }
                     else this.player.body.velocity.x=this.player.body.velocity.x-3;
                 }
-                this.player.anims.play('left', true);
+                if(touchg) this.player.anims.play('left', true);
+                else this.player.anims.play('caidai', true);
                }
            }
-           corrder (value){
+           corrder (value,touchg){
                if(value){
                 //this.player.setVelocityX(160);
                 if(this.player.body.velocity.x<400) {
@@ -58,7 +60,8 @@
                     }
                     else this.player.body.velocity.x=this.player.body.velocity.x+3;
                 }
-                this.player.anims.play('right', true);
+                if(touchg) this.player.anims.play('right', true);
+                else this.player.anims.play('caidad', true);
                }
            }
            saltar(salto,touchingd){
@@ -72,18 +75,32 @@
                     }
                }
            }
-           idle(value,value2){
-            if(!(value || value2)) {
+           idle(izquierda,derecha,touchg){
+            if(!(izquierda || derecha)) {
                 if(this.player.body.velocity.x>0) {
                     if((this.player.body.velocity.x-5)<0) this.player.setVelocityX(0);
                     else this.player.body.velocity.x-=5;
+                    this.banim=false;
                     }
                 if(this.player.body.velocity.x<0) {
                     if((this.player.body.velocity.x+5)>0) this.player.setVelocityX(0);
                     else this.player.body.velocity.x+=5;
+                    this.banim=true;
                     }
-                this.player.anims.play('turn');
+            if(touchg) {
+                //COPIAR LO DE ABAJO CON LAS DE FRENADO, BORRAR LA DEL TURN
+                if(!(this.player.body.velocity.x)){
+                    this.player.anims.play('turn');
+                } else {
+                    if(this.banim) this.player.anims.play('frenadai', true);
+                    else this.player.anims.play('frenadad', true);
+                }
             }
+            else if(this.banim){
+                this.player.anims.play('caidai', true);
+            }
+            else this.player.anims.play('caidad', true);
+           }
            }
            parametros(sprite,bounce){
             jugador.player=sprite;
@@ -111,7 +128,7 @@
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.2);
+        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.3);
 
         this.anims.create({
             key: 'left',
@@ -133,6 +150,30 @@
             repeat: -1
         });
 
+        this.anims.create({
+            key: 'caidad',
+            frames: [ { key: 'dude', frame: 13 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'caidai',
+            frames: [ { key: 'dude', frame: 14 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'frenadai',
+            frames: [ { key: 'dude', frame: 14 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'frenadad',
+            frames: [ { key: 'dude', frame: 13 } ],
+            frameRate: 20
+        });
+
         cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.collider(jugador.player, platforms);
@@ -140,10 +181,10 @@
     }
     function update ()
     {
-        jugador.corrizq(cursors.left.isDown);
-        jugador.corrder(cursors.right.isDown);
+        jugador.corrizq(cursors.left.isDown,jugador.player.body.touching.down);
+        jugador.corrder(cursors.right.isDown,jugador.player.body.touching.down);
         jugador.saltar(cursors.up.isDown,jugador.player.body.touching.down);
-        jugador.idle(cursors.left.isDown,cursors.right.isDown);
+        jugador.idle(cursors.left.isDown,cursors.right.isDown,jugador.player.body.touching.down);
     }
 </script>
 
