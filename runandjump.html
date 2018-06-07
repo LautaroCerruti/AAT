@@ -37,6 +37,7 @@
                 this.player;
                 this.dbljmp=false;
                 this.banim=false;
+		this.salto=false;
            }
            corrizq (value,touchg){
                if(value){
@@ -63,6 +64,7 @@
                 else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
                     else this.player.anims.play('saltod');
                }
+		if(touchg) this.salto=false;
            }
            saltar(salto,touchingd){
                if(salto){
@@ -73,7 +75,9 @@
                         this.player.setVelocityY(-250);
                         this.dbljmp = false;
                     }
-               }
+               } else {
+			if(!this.salto){this.dbljmp=true;this.salto=true}
+}
            }
            idle(izquierda,derecha,touchg){
             if(!(izquierda || derecha)) {
@@ -88,6 +92,7 @@
                     this.banim=true;
                     }
             if(touchg) {
+		this.salto=false;
                 if(!(this.player.body.velocity.x)){
                     this.player.anims.play('turn');
                 } else {
@@ -128,10 +133,12 @@
         this.add.image(400, 300, 'sky');
 
         platforms = this.physics.add.staticGroup();
-
+	platforms.create(600, 400, 'ground');
+        platforms.create(50, 250, 'ground');
+        platforms.create(750, 220, 'ground');
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.3);
+        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.0);
 
         this.anims.create({
             key: 'left',
