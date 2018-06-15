@@ -37,7 +37,7 @@
                 this.player;
                 this.dbljmp=false;
                 this.banim=false;
-		this.salto=false;
+		        this.salto=false;
            }
            corrizq (value,touchg){
                if(value){
@@ -118,6 +118,9 @@
     }
     var platforms;
     var cursors;
+    var simba;
+    var loli;
+    var h=true;
     let jugador = new GranDad();
     var game = new Phaser.Game(config);
 
@@ -126,6 +129,8 @@
         this.load.image('sky', './assets/sky.png');
         this.load.image('ground', './assets/platform.png');
         this.load.spritesheet('dude', './assets/duude.png', { frameWidth: 30, frameHeight: 43 });
+        this.load.spritesheet('simba', './assets/simba.png', { frameWidth: 26, frameHeight: 33 });
+        this.load.spritesheet('loli', './assets/loli.png', { frameWidth: 37, frameHeight: 36 });
     }
 
     function create ()
@@ -133,10 +138,16 @@
         this.add.image(400, 300, 'sky');
 
         platforms = this.physics.add.staticGroup();
-	platforms.create(600, 400, 'ground');
+	    platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+        simba=this.physics.add.sprite(50, 250, 'simba');
+        this.physics.add.collider(simba, platforms);
+        loli=this.physics.add.sprite(750, 250, 'loli');
+        this.physics.add.collider(loli, platforms);
+        loli.setGravityY(0);
 
         jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.0);
 
@@ -144,6 +155,20 @@
             key: 'left',
             frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 5 }),
             frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'spin',
+            frames: this.anims.generateFrameNumbers('loli', { start: 0, end: 7 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'twerk',
+            frames: this.anims.generateFrameNumbers('simba', { start: 0, end: 1 }),
+            frameRate: 5,
             repeat: -1
         });
 
@@ -207,6 +232,11 @@
         jugador.corrder(cursors.right.isDown,jugador.player.body.touching.down);
         jugador.saltar(cursors.up.isDown,jugador.player.body.touching.down);
         jugador.idle(cursors.left.isDown,cursors.right.isDown,jugador.player.body.touching.down);
+        if(h){
+        simba.anims.play('twerk');
+        loli.anims.play('spin');
+        h = false;
+        }
     }
 </script>
 
