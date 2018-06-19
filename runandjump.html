@@ -39,32 +39,39 @@
                 this.banim=false;
 		        this.salto=false;
            }
-           corrizq (value,touchg){
-               if(value){
+           modifvelizq () {
                 if(this.player.body.velocity.x>-400) {
                     if(this.player.body.velocity.x>0) {
                         this.player.body.velocity.x=this.player.body.velocity.x-10;
                     }
                     else this.player.body.velocity.x=this.player.body.velocity.x-3;
                 }
-                if(touchg) this.player.anims.play('left', true);
-                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
-                    else this.player.anims.play('saltoi');
-               }
            }
-           corrder (value,touchg){
-               if(value){
+           modifvelder() {
                 if(this.player.body.velocity.x<400) {
                     if(this.player.body.velocity.x<0) {
                         this.player.body.velocity.x=this.player.body.velocity.x+10;
                     }
                     else this.player.body.velocity.x=this.player.body.velocity.x+3;
                 }
+           }
+           corrizq (value,touchg){
+               if(value){
+                this.modifvelizq();
+                if(touchg) this.player.anims.play('left', true);
+                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
+                    else this.player.anims.play('saltoi');
+               }
+               if(touchg) this.salto=false;
+           }
+           corrder (value,touchg){
+               if(value){
+                this.modifvelder();
                 if(touchg) this.player.anims.play('right', true);
                 else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
                     else this.player.anims.play('saltod');
                }
-		if(touchg) this.salto=false;
+		        if(touchg) this.salto=false;
            }
            saltar(salto,touchingd){
                if(salto){
@@ -75,9 +82,8 @@
                         this.player.setVelocityY(-250);
                         this.dbljmp = false;
                     }
-               } else {
+               }
 			if(!this.salto){this.dbljmp=true;this.salto=true}
-}
            }
            idle(izquierda,derecha,touchg){
             if(!(izquierda || derecha)) {
@@ -92,7 +98,7 @@
                     this.banim=true;
                     }
             if(touchg) {
-		this.salto=false;
+		        this.salto=false;
                 if(!(this.player.body.velocity.x)){
                     this.player.anims.play('turn');
                 } else {
