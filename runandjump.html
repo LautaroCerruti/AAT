@@ -37,34 +37,41 @@
                 this.player;
                 this.dbljmp=false;
                 this.banim=false;
-		this.salto=false;
+		        this.salto=false;
            }
-           corrizq (value,touchg){
-               if(value){
+           modifvelizq () {
                 if(this.player.body.velocity.x>-400) {
                     if(this.player.body.velocity.x>0) {
                         this.player.body.velocity.x=this.player.body.velocity.x-10;
                     }
                     else this.player.body.velocity.x=this.player.body.velocity.x-3;
                 }
-                if(touchg) this.player.anims.play('left', true);
-                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
-                    else this.player.anims.play('saltoi');
-               }
            }
-           corrder (value,touchg){
-               if(value){
+           modifvelder() {
                 if(this.player.body.velocity.x<400) {
                     if(this.player.body.velocity.x<0) {
                         this.player.body.velocity.x=this.player.body.velocity.x+10;
                     }
                     else this.player.body.velocity.x=this.player.body.velocity.x+3;
                 }
+           }
+           corrizq (value,touchg){
+               if(value){
+                this.modifvelizq();
+                if(touchg) this.player.anims.play('left', true);
+                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
+                    else this.player.anims.play('saltoi');
+               }
+               if(touchg) this.salto=false;
+           }
+           corrder (value,touchg){
+               if(value){
+                this.modifvelder();
                 if(touchg) this.player.anims.play('right', true);
                 else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
                     else this.player.anims.play('saltod');
                }
-		if(touchg) this.salto=false;
+		        if(touchg) this.salto=false;
            }
            saltar(salto,touchingd){
                if(salto){
@@ -75,9 +82,8 @@
                         this.player.setVelocityY(-250);
                         this.dbljmp = false;
                     }
-               } else {
+               }
 			if(!this.salto){this.dbljmp=true;this.salto=true}
-}
            }
            idle(izquierda,derecha,touchg){
             if(!(izquierda || derecha)) {
@@ -92,7 +98,7 @@
                     this.banim=true;
                     }
             if(touchg) {
-		this.salto=false;
+		        this.salto=false;
                 if(!(this.player.body.velocity.x)){
                     this.player.anims.play('turn');
                 } else {
@@ -110,14 +116,84 @@
                     else this.player.anims.play('saltod');
            }
            }
-           parametros(sprite,bounce){
+           golpe(touchg,space){
+                if(touchg && space && (this.player.body.velocity.x==0)){
+                    if(this.banim){
+                        this.player.anims.play('saltoi');
+                    }
+                    else{
+                        this.player.anims.play('saltod');
+                    }
+                }
+           }
+           parametros(sprite, bounce, that, spritesheet){
             jugador.player=sprite;
             jugador.player.setBounce(bounce);
             jugador.player.setCollideWorldBounds(true);
+
+            that.anims.create({
+            key: 'left',
+            frames: that.anims.generateFrameNumbers(spritesheet, { start: 0, end: 5 }),
+            frameRate: 10,
+            repeat: -1
+            });
+
+        that.anims.create({
+            key: 'turn',
+            frames: [ { key: spritesheet, frame: 6 } ],
+            frameRate: 1
+        });
+
+        that.anims.create({
+            key: 'right',
+            frames: that.anims.generateFrameNumbers(spritesheet, { start: 7, end: 12 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        that.anims.create({
+            key: 'caidad',
+            frames: [ { key: spritesheet, frame: 13 } ],
+            frameRate: 30
+        });
+
+        that.anims.create({
+            key: 'caidai',
+            frames: [ { key: spritesheet, frame: 14 } ],
+            frameRate: 30
+        });
+
+        that.anims.create({
+            key: 'frenadai',
+            frames: [ { key: spritesheet, frame: 16 } ],
+            frameRate: 1
+        });
+
+        that.anims.create({
+            key: 'frenadad',
+            frames: [ { key: spritesheet, frame: 15 } ],
+            frameRate: 1
+        });
+
+        that.anims.create({
+            key: 'saltod',
+            frames: [ { key: spritesheet, frame: 17 } ],
+            frameRate: 1
+        });
+
+        that.anims.create({
+            key: 'saltoi',
+            frames: [ { key: spritesheet, frame: 18 } ],
+            frameRate: 1
+        });
            }
     }
+
     var platforms;
     var cursors;
+    var simba;
+    var loli;
+    var h=true;
     let jugador = new GranDad();
     var game = new Phaser.Game(config);
 
@@ -126,6 +202,8 @@
         this.load.image('sky', './assets/sky.png');
         this.load.image('ground', './assets/platform.png');
         this.load.spritesheet('dude', './assets/duude.png', { frameWidth: 30, frameHeight: 43 });
+        this.load.spritesheet('simba', './assets/simba.png', { frameWidth: 26, frameHeight: 33 });
+        this.load.spritesheet('loli', './assets/loli.png', { frameWidth: 37, frameHeight: 36 });
     }
 
     function create ()
@@ -133,67 +211,31 @@
         this.add.image(400, 300, 'sky');
 
         platforms = this.physics.add.staticGroup();
-	platforms.create(600, 400, 'ground');
+	    platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.0);
+        simba=this.physics.add.sprite(50, 250, 'simba');
+        this.physics.add.collider(simba, platforms);
+        loli=this.physics.add.sprite(750, 250, 'loli');
+        this.physics.add.collider(loli, platforms);
+        loli.setGravityY(0);
+
+        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.0,this,'dude'); //El ultimo string que esta de parametro es el nombre del spritesheet que asignamos en preload
 
         this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 5 }),
+            key: 'spin',
+            frames: this.anims.generateFrameNumbers('loli', { start: 0, end: 7 }),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
-            key: 'turn',
-            frames: [ { key: 'dude', frame: 6 } ],
-            frameRate: 1
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 7, end: 12 }),
-            frameRate: 10,
+            key: 'twerk',
+            frames: this.anims.generateFrameNumbers('simba', { start: 0, end: 1 }),
+            frameRate: 5,
             repeat: -1
-        });
-
-        this.anims.create({
-            key: 'caidad',
-            frames: [ { key: 'dude', frame: 13 } ],
-            frameRate: 30
-        });
-
-        this.anims.create({
-            key: 'caidai',
-            frames: [ { key: 'dude', frame: 14 } ],
-            frameRate: 30
-        });
-
-        this.anims.create({
-            key: 'frenadai',
-            frames: [ { key: 'dude', frame: 16 } ],
-            frameRate: 1
-        });
-
-        this.anims.create({
-            key: 'frenadad',
-            frames: [ { key: 'dude', frame: 15 } ],
-            frameRate: 1
-        });
-
-        this.anims.create({
-            key: 'saltod',
-            frames: [ { key: 'dude', frame: 17 } ],
-            frameRate: 1
-        });
-
-        this.anims.create({
-            key: 'saltoi',
-            frames: [ { key: 'dude', frame: 18 } ],
-            frameRate: 1
         });
 
         cursors = this.input.keyboard.createCursorKeys();
@@ -207,6 +249,12 @@
         jugador.corrder(cursors.right.isDown,jugador.player.body.touching.down);
         jugador.saltar(cursors.up.isDown,jugador.player.body.touching.down);
         jugador.idle(cursors.left.isDown,cursors.right.isDown,jugador.player.body.touching.down);
+        jugador.golpe(jugador.player.body.touching.down,cursors.space.isDown);
+        if(h){
+        simba.anims.play('twerk');
+        loli.anims.play('spin');
+        h = false;
+        }
     }
 </script>
 
