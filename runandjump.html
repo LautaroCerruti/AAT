@@ -247,6 +247,7 @@
         var loli;
         var h = true;
         var game = new Phaser.Game(config);
+        var w, a, s, d, j;
 
         function preload() {
             this.load.image('sky', './assets/sky.png');
@@ -296,6 +297,12 @@
             this.physics.add.collider(jugador.player, platforms);
             this.physics.add.collider(jugador2.player, platforms);
 
+            w = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+            a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+            s = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+            d = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+            j = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+
         }
         function update() {
             jugador.corrizq(cursors.left.isDown, jugador.player.body.touching.down);
@@ -303,11 +310,11 @@
             jugador.saltar(cursors.up.isDown, jugador.player.body.touching.down);
             jugador.idle(cursors.left.isDown, cursors.right.isDown, cursors.space.isDown, jugador.player.body.touching.down);
             jugador.golpe(jugador.player.body.touching.down, cursors.space.isDown);
-            jugador2.corrizq(cursors.left.isDown, jugador2.player.body.touching.down);
-            jugador2.corrder(cursors.right.isDown, jugador2.player.body.touching.down);
-            jugador2.saltar(cursors.up.isDown, jugador2.player.body.touching.down);
-            jugador2.idle(cursors.left.isDown, cursors.right.isDown, cursors.space.isDown, jugador2.player.body.touching.down);
-            jugador2.golpe(jugador2.player.body.touching.down, cursors.space.isDown);
+            jugador2.corrizq(a.isDown, jugador2.player.body.touching.down);
+            jugador2.corrder(d.isDown, jugador2.player.body.touching.down);
+            jugador2.saltar(w.isDown, jugador2.player.body.touching.down);
+            jugador2.idle(d.isDown, a.isDown, j.isDown, jugador2.player.body.touching.down);
+            jugador2.golpe(jugador2.player.body.touching.down, j.isDown);
             if (h) {
                 simba.anims.play('twerk');
                 loli.anims.play('spin');
