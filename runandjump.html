@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8" />
     <title>Cerruti & García Mata</title>
-    <script src="http://cdn.jsdelivr.net/npm/phaser@3.1.1/dist/phaser.js"></script>
+    <script src="phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -16,7 +16,7 @@
 
     var config = {
         type: Phaser.AUTO,
-        width: 800,
+        width: 1080,
         height: 600,
         physics: {
             default: 'arcade',
@@ -38,98 +38,13 @@
                 this.dbljmp=false;
                 this.banim=false;
 		        this.salto=false;
-           }
-           modifvelizq () {
-                if(this.player.body.velocity.x>-400) {
-                    if(this.player.body.velocity.x>0) {
-                        this.player.body.velocity.x=this.player.body.velocity.x-10;
-                    }
-                    else this.player.body.velocity.x=this.player.body.velocity.x-3;
-                }
-           }
-           modifvelder() {
-                if(this.player.body.velocity.x<400) {
-                    if(this.player.body.velocity.x<0) {
-                        this.player.body.velocity.x=this.player.body.velocity.x+10;
-                    }
-                    else this.player.body.velocity.x=this.player.body.velocity.x+3;
-                }
-           }
-           corrizq (value,touchg){
-               if(value){
-                this.modifvelizq();
-                if(touchg) this.player.anims.play('left', true);
-                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
-                    else this.player.anims.play('saltoi');
-               }
-               if(touchg) this.salto=false;
-           }
-           corrder (value,touchg){
-               if(value){
-                this.modifvelder();
-                if(touchg) this.player.anims.play('right', true);
-                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
-                    else this.player.anims.play('saltod');
-               }
-		        if(touchg) this.salto=false;
-           }
-           saltar(salto,touchingd){
-               if(salto){
-                if(touchingd){
-                    this.player.setVelocityY(-250);
-                    this.dbljmp=true;
-                    } else if((this.player.body.velocity.y>-50) && this.dbljmp){
-                        this.player.setVelocityY(-250);
-                        this.dbljmp = false;
-                    }
-               }
-			if(!this.salto){this.dbljmp=true;this.salto=true}
-           }
-           idle(izquierda,derecha,touchg){
-            if(!(izquierda || derecha)) {
-                if(this.player.body.velocity.x>0) {
-                    if((this.player.body.velocity.x-5)<0) this.player.setVelocityX(0);
-                    else this.player.body.velocity.x-=5;
-                    this.banim=false;
-                    }
-                if(this.player.body.velocity.x<0) {
-                    if((this.player.body.velocity.x+5)>0) this.player.setVelocityX(0);
-                    else this.player.body.velocity.x+=5;
-                    this.banim=true;
-                    }
-            if(touchg) {
-		        this.salto=false;
-                if(!(this.player.body.velocity.x)){
-                    this.player.anims.play('turn');
-                } else {
-                    if(this.banim) this.player.anims.play('frenadai');
-                    else this.player.anims.play('frenadad');
-                }
-            }
-            else
-                if(this.banim){
-                    if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
-                    else this.player.anims.play('saltoi');            
-                }
-            else 
-                if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
-                    else this.player.anims.play('saltod');
-           }
-           }
-           golpe(touchg,space){
-                if(touchg && space && (this.player.body.velocity.x==0)){
-                    if(this.banim){
-                        this.player.anims.play('saltoi');
-                    }
-                    else{
-                        this.player.anims.play('saltod');
-                    }
-                }
+                this.contadoractivo=false;
+                this.contador=0;
            }
            parametros(sprite, bounce, that, spritesheet){
-            jugador.player=sprite;
-            jugador.player.setBounce(bounce);
-            jugador.player.setCollideWorldBounds(true);
+            this.player=sprite;
+            this.player.setBounce(bounce);
+            this.player.setCollideWorldBounds(true);
 
             that.anims.create({
             key: 'left',
@@ -137,6 +52,19 @@
             frameRate: 10,
             repeat: -1
             });
+
+        that.anims.create({
+            key: 'golped',
+            frames: that.anims.generateFrameNumbers(spritesheet, { start: 19, end: 22 }),
+            frameRate: 7,
+            repeat: -1
+        });
+        that.anims.create({
+            key: 'golpei',
+            frames: that.anims.generateFrameNumbers(spritesheet, { start: 23, end: 25 }),
+            frameRate: 7,
+            repeat: -1
+        });
 
         that.anims.create({
             key: 'turn',
@@ -187,6 +115,99 @@
             frameRate: 1
         });
            }
+           modifvelizq () {
+                if(this.player.body.velocity.x>-400) {
+                    if(this.player.body.velocity.x>0) {
+                        this.player.body.velocity.x=this.player.body.velocity.x-10;
+                    }
+                    else this.player.body.velocity.x=this.player.body.velocity.x-3;
+                }
+           }
+           modifvelder() {
+                if(this.player.body.velocity.x<400) {
+                    if(this.player.body.velocity.x<0) {
+                        this.player.body.velocity.x=this.player.body.velocity.x+10;
+                    }
+                    else this.player.body.velocity.x=this.player.body.velocity.x+3;
+                }
+           }
+           corrizq (value,touchg){
+               if(value){
+                this.modifvelizq();
+                if(touchg) this.player.anims.play('left', true);
+                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
+                    else this.player.anims.play('saltoi');
+               }
+               if(touchg) this.salto=false;
+           }
+           corrder (value,touchg){
+               if(value){
+                this.modifvelder();
+                if(touchg) this.player.anims.play('right', true);
+                else if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
+                    else this.player.anims.play('saltod');
+               }
+		        if(touchg) this.salto=false;
+           }
+           saltar(salto,touchingd){
+               if(salto){
+                if(touchingd){
+                    this.player.setVelocityY(-250);
+                    this.dbljmp=true;
+                    } else if((this.player.body.velocity.y>-50) && this.dbljmp){
+                        this.player.setVelocityY(-250);
+                        this.dbljmp = false;
+                    }
+               }
+			if(!this.salto){this.dbljmp=true;this.salto=true}
+           }
+           idle(izquierda,derecha,golpe,touchg){
+            if(!(izquierda || derecha)) {
+                if(this.player.body.velocity.x>0) {
+                    if((this.player.body.velocity.x-5)<0) this.player.setVelocityX(0);
+                    else this.player.body.velocity.x-=5;
+                    this.banim=false;
+                    }
+                if(this.player.body.velocity.x<0) {
+                    if((this.player.body.velocity.x+5)>0) this.player.setVelocityX(0);
+                    else this.player.body.velocity.x+=5;
+                    this.banim=true;
+                    }
+            if(touchg) {
+		        this.salto=false;
+                if(!golpe){//si no esta pegando
+                if(!this.player.body.velocity.x){//y la velocidad es 0
+                    this.player.anims.play('turn');//reproduce el idle
+                } else {
+                    if(this.banim) this.player.anims.play('frenadai');//si la vel no es 0 frena segun la direccion establecida en this.banim
+                    else this.player.anims.play('frenadad');
+                }
+                } else if(this.player.body.velocity.x!=0){ //en caso de que este pegando pero la velocidad sea distinta a 0
+                    if(this.banim) this.player.anims.play('frenadai'); // frena segun banim
+                    else this.player.anims.play('frenadad');
+            }
+            }
+            else
+                if(this.banim){
+                    if(this.player.body.velocity.y>=-100) this.player.anims.play('caidai');
+                    else this.player.anims.play('saltoi');            
+                }
+            else 
+                if(this.player.body.velocity.y>=-100) this.player.anims.play('caidad');
+                    else this.player.anims.play('saltod');
+            }
+            }
+           golpe(touchg,space){
+                if(touchg && space && (this.player.body.velocity.x==0)){
+                    if(this.banim){
+                        this.player.anims.play('golpei',true);
+                    }
+                    else{
+                        this.player.anims.play('golped', true);
+                    }
+                }
+           }
+           //collgolpe(a,bomb){}
     }
 
     var platforms;
@@ -194,18 +215,19 @@
     var simba;
     var loli;
     var h=true;
-    let jugador = new GranDad();
     var game = new Phaser.Game(config);
 
     function preload ()
     {
         this.load.image('sky', './assets/sky.png');
         this.load.image('ground', './assets/platform.png');
-        this.load.spritesheet('dude', './assets/duude.png', { frameWidth: 30, frameHeight: 43 });
+        this.load.spritesheet('dude', './assets/duude2.png', { frameWidth: 43, frameHeight: 43 });
         this.load.spritesheet('simba', './assets/simba.png', { frameWidth: 26, frameHeight: 33 });
         this.load.spritesheet('loli', './assets/loli.png', { frameWidth: 37, frameHeight: 36 });
     }
 
+    let jugador = new GranDad();
+    let jugador2 = new GranDad();
     function create ()
     {
         this.add.image(400, 300, 'sky');
@@ -214,7 +236,7 @@
 	    platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
-        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        platforms.create(400, 650, 'ground').setScale(4).refreshBody();
 
         simba=this.physics.add.sprite(50, 250, 'simba');
         this.physics.add.collider(simba, platforms);
@@ -222,7 +244,9 @@
         this.physics.add.collider(loli, platforms);
         loli.setGravityY(0);
 
-        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.0,this,'dude'); //El ultimo string que esta de parametro es el nombre del spritesheet que asignamos en preload
+        jugador.parametros(this.physics.add.sprite(500, 450, 'dude'),0.0,this,'dude');
+        jugador2.parametros(this.physics.add.sprite(350, 450, 'dude'),0.0,this,'dude'); 
+        //El primer parametro es el sprite que se le asigna y la posicion, el segundo es el bounce que se le quiere asignar, el tercero es la funcion crete para las animaciones y el ultimo string que esta de parametro es el nombre del spritesheet que asignamos en preload
 
         this.anims.create({
             key: 'spin',
@@ -241,15 +265,21 @@
         cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.collider(jugador.player, platforms);
-
+        this.physics.add.collider(jugador2.player, platforms);
+        
     }
-    function update ()
+    function update()
     {
         jugador.corrizq(cursors.left.isDown,jugador.player.body.touching.down);
         jugador.corrder(cursors.right.isDown,jugador.player.body.touching.down);
         jugador.saltar(cursors.up.isDown,jugador.player.body.touching.down);
-        jugador.idle(cursors.left.isDown,cursors.right.isDown,jugador.player.body.touching.down);
+        jugador.idle(cursors.left.isDown,cursors.right.isDown,cursors.space.isDown,jugador.player.body.touching.down);
         jugador.golpe(jugador.player.body.touching.down,cursors.space.isDown);
+        jugador2.corrizq(cursors.left.isDown,jugador2.player.body.touching.down);
+        jugador2.corrder(cursors.right.isDown,jugador2.player.body.touching.down);
+        jugador2.saltar(cursors.up.isDown,jugador2.player.body.touching.down);
+        jugador2.idle(cursors.left.isDown,cursors.right.isDown,cursors.space.isDown,jugador2.player.body.touching.down);
+        jugador2.golpe(jugador2.player.body.touching.down,cursors.space.isDown);
         if(h){
         simba.anims.play('twerk');
         loli.anims.play('spin');
