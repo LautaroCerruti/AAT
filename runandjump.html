@@ -34,21 +34,25 @@
             }
         };
 
-        class GranDad {
-            constructor() {
-                this.player;
-                this.dbljmp = false;
-                this.banim = false;
-                this.salto = false;
-                this.contadoractivo = false;
-                this.contador = 0;
-            }
-            parametros(sprite, bounce, that, spritesheet) {
-                this.player = sprite;
-                this.player.setBounce(bounce);
-                this.player.setCollideWorldBounds(true);
+        //comienzo de la clase
 
-                that.anims.create({
+        class GranDad {
+
+            constructor() {          // el constructor sirve para mencionar las variables y asignarles algunos valores predeterminados, excepto a player
+                this.player;         // esta es la variable jugador en sí
+                this.dbljmp = false; // esta variable indica si el doble salto esta disponible o no
+                this.banim = false;  // esta variable indica si el último movimiento fue hacia la derecha(false) o hacia la izquierda(true)
+                this.salto = false;  // esta variable indica si la persona salto o se tiro de una plataforma
+                this.contadoractivo = false; // esta variable indica que el contador esta funcionando, x lo que no se iene que poder realizar ninguna otra accion
+                this.contador = 0; // este es el contador antes mencionado, cuenta hasta 35 que es lo que tarda toda la animacion
+            }
+
+            parametros(sprite, bounce, that, spritesheet) { //función que cumple el rol de constructor para el personaje
+                this.player = sprite;                       //acá asignamos el sprite
+                this.player.setBounce(bounce);              //acá el bounce
+                this.player.setCollideWorldBounds(true);    // y acá los collider con el mundo
+
+                that.anims.create({  //esta función crea animaciones
                     key: 'left',
                     frames: that.anims.generateFrameNumbers(spritesheet, { start: 0, end: 5 }),
                     frameRate: 10,
@@ -63,7 +67,7 @@
                 });
                 that.anims.create({
                     key: 'golpei',
-                    frames: that.anims.generateFrameNumbers(spritesheet, { start: 23, end: 25 }),
+                    frames: that.anims.generateFrameNumbers(spritesheet, { start: 23, end: 26 }),
                     frameRate: 7,
                     repeat: -1
                 });
@@ -117,15 +121,19 @@
                     frameRate: 1
                 });
             }
-            modifvelizq() {
+
+            modifvelizq() { //esta función modifica la velocidad del personaje hacia la izquierda
+                //está adaptada como método privado (se llama desde otro método de la clase)
                 if (this.player.body.velocity.x > -400) {
-                    if (this.player.body.velocity.x > 0) {
+                    if (this.player.body.velocity.x > 0) {  //si el personaje se está moviendo hacia el otro lado, frena mas rápido
                         this.player.body.velocity.x = this.player.body.velocity.x - 10;
                     }
                     else this.player.body.velocity.x = this.player.body.velocity.x - 3;
                 }
             }
-            modifvelder() {
+
+            modifvelder() { //esta función modifica la velocidad del personaje hacia la derecha
+                //también está adaptada como método privado
                 if (this.player.body.velocity.x < 400) {
                     if (this.player.body.velocity.x < 0) {
                         this.player.body.velocity.x = this.player.body.velocity.x + 10;
@@ -133,76 +141,80 @@
                     else this.player.body.velocity.x = this.player.body.velocity.x + 3;
                 }
             }
-            corrizq(value, touchg) {
-                if (value) {
-                    if (this.contadoractivo && this.contador < 35) {
-                        this.contador++;
+
+            corrizq(presionando) {      //toma el valor booleano de si esta presionando el boton
+                if (presionando) {              //si esta presionando
+                    if (this.contadoractivo && this.contador < 35) { //si el contador esta activo significa que pegó, por lo que tiene que esperar 35 frames
+                        this.contador++;    //suma al contador
                     }
                     else {
-                        this.modifvelizq();
-                        if (touchg) this.player.anims.play('left', true);
-                        else if (this.player.body.velocity.y >= -100) this.player.anims.play('caidai');
-                        else this.player.anims.play('saltoi');
+                        this.modifvelizq();     //ejecuta la funcion
+                        if (this.player.body.touching.down) this.player.anims.play('left', true); //si esta tocando el suelo ejecuta la animacion de correr
+                        else if (this.player.body.velocity.y >= -100) this.player.anims.play('caidai'); //sino: si la velocidad en y es mayor a -100 entonces se reproduce la animacion de caida
+                        else this.player.anims.play('saltoi');  //si es menor a -100 esta saltando
 
-                        this.contador = 0;
+                        this.contador = 0;    // si no pegó, vuelve el contador a 0 y lo desactiva
                         this.contadoractivo = false;
                     }
-                    if (touchg) this.salto = false;
+                    if (this.player.body.touching.down) this.salto = false; // si esta tocando el sulo significa que no saltó
                 }
             }
-            corrder(value, touchg) {
-                if (value) {
+
+            corrder(presionando) { // es igual a la funcion de arriba, solo cambian las animaciones que reproduce y la funcion de movimiento
+                if (presionando) {
                     if (this.contadoractivo && this.contador < 35) {
                         this.contador++;
                     }
                     else {
                         this.modifvelder();
-                        if (touchg) this.player.anims.play('right', true);
+                        if (this.player.body.touching.down) this.player.anims.play('right', true);
                         else if (this.player.body.velocity.y >= -100) this.player.anims.play('caidad');
                         else this.player.anims.play('saltod');
                         this.contador = 0;
                         this.contadoractivo = false;
                     }
                 }
-                if (touchg) this.salto = false;
+                if (this.player.body.touching.down) this.salto = false;
             }
-            saltar(salto, touchingd) {
-                if (salto) {
-                    if (this.contadoractivo && this.contador < 35) {
-                        this.contador++;
+
+            saltar(presionando) { //toma el valor booleano de si el boton de salto esta siendo presionado
+                if (presionando) {
+                    if (this.contadoractivo && this.contador < 35) {    //si el contador esta activo significa que pegó, por lo que tiene que esperar 35 frames
+                        this.contador++;                                //suma al contador
                     }
                     else {
-                        if (touchingd) {
-                            this.player.setVelocityY(-250);
-                            this.dbljmp = true;
-                        } else if ((this.player.body.velocity.y > -50) && this.dbljmp) {
-                            this.player.setVelocityY(-250);
-                            this.dbljmp = false;
+                        if (this.player.body.touching.down) { // si esta tocando el piso
+                            this.player.setVelocityY(-250);   // salta
+                            this.dbljmp = true;               // y activa el doble salto
+                        } else if ((this.player.body.velocity.y > -50) && this.dbljmp) { // si empezo a caer, y el doble salto esta disponible
+                            this.player.setVelocityY(-250);   //salta
+                            this.dbljmp = false;              // y desactiva el doble salto
                         }
-                        this.contador = 0;
+                        this.contador = 0;                    // si no pegó, vuelve el contador a 0 y lo desactiva
                         this.contadoractivo = false;
                     }
                 }
-                if (!this.salto) { this.dbljmp = true; this.salto = true }
+                if (!this.salto && !this.player.body.touching.down) { this.dbljmp = true; this.salto = true; }
+                //si la persona no salto pero o esta tocando el suelo, le activa el doble salto y establece como que salto, pero lo que hizo fue tirarse de una plataforma
             }
-            idle(izquierda, derecha, golpe, touchg) {
-                if (this.contadoractivo && this.contador < 35) {
-                    this.contador++;
+            idle(izquierda, derecha, golpe) {
+                if (this.contadoractivo && this.contador < 35) { //si el contador esta activo significa que pegó, por lo que tiene que esperar 35 frames
+                    this.contador++;                             //suma al contador
                 }
-                else {
-                    if (!(izquierda || derecha)) {
-                        if (this.player.body.velocity.x > 0) {
+                else { // si no se esta golpeando
+                    if (!(izquierda || derecha)) { // si no se esta presionando ningún boton de desplazamiento
+                        if (this.player.body.velocity.x > 0) {  //si se esta moviendo hacia la derecha, frena hacia la izquierda
                             if ((this.player.body.velocity.x - 5) < 0) this.player.setVelocityX(0);
                             else this.player.body.velocity.x -= 5;
-                            this.banim = false;
+                            this.banim = false;                 // establece que su último movimiento fue hacia la derecha
                         }
-                        if (this.player.body.velocity.x < 0) {
+                        if (this.player.body.velocity.x < 0) {  //si se esta moviendo hacia la izquierda, frena hacia la derecha
                             if ((this.player.body.velocity.x + 5) > 0) this.player.setVelocityX(0);
                             else this.player.body.velocity.x += 5;
-                            this.banim = true;
+                            this.banim = true;                  // establece que su último movimiento fue hacia la izquierda
                         }
-                        if (touchg) {
-                            this.salto = false;
+                        if (this.player.body.touching.down) {   //en esta parte se reproducen las animaciones: Si esta tocando el suelo
+                            this.salto = false; //se establece el salto en false
                             if (!golpe) {//si no esta pegando
                                 if (!this.player.body.velocity.x) {//y la velocidad es 0
                                     this.player.anims.play('turn');//reproduce el idle
@@ -215,31 +227,33 @@
                                 else this.player.anims.play('frenadad');
                             }
                         }
-                        else
-                            if (this.banim) {
-                                if (this.player.body.velocity.y >= -100) this.player.anims.play('caidai');
-                                else this.player.anims.play('saltoi');
+                        else    //si se encuentra en el aire
+                            if (this.banim) {   //y la ultima direccion fue hacia la izquierda
+                                if (this.player.body.velocity.y >= -100) this.player.anims.play('caidai'); // si la velocidad en y es mayor a -100 esta cayendo
+                                else this.player.anims.play('saltoi');                                     // si no esta saltando
                             }
-                            else
+                            else    //si la ultima direccion fue hacia la derecha
                                 if (this.player.body.velocity.y >= -100) this.player.anims.play('caidad');
                                 else this.player.anims.play('saltod');
                     }
-                    this.contador = 0;
+                    this.contador = 0;              // si no pegó, vuelve el contador a 0 y lo desactiva
                     this.contadoractivo = false;
                 }
             }
-            golpe(touchg, space) {
-                if (touchg && space && (this.player.body.velocity.x == 0)) {
-                    if (this.banim) {
+            golpe(space) {  //toma el boton de golpe
+                if (this.player.body.touching.down && space && (this.player.body.velocity.x == 0)) {    // si esta en el piso, presionó el boton y so velocidad en x es 0
+                    if (this.banim) {   // reproduce la animacion de pegar hacia u lado o hacia el otro dependiendo de banim
                         this.player.anims.play('golpei', true);
                     }
                     else {
                         this.player.anims.play('golped', true);
                     }
-                    this.contadoractivo = true;
+                    this.contadoractivo = true; //y activa el contador que desabilita las demas funciones para que se reproduzca la animacion completa
                 }
             }
         }
+
+        //Fin de la clase
 
         var platforms;
         var cursors;
@@ -257,11 +271,12 @@
             this.load.spritesheet('loli', './assets/loli.png', { frameWidth: 37, frameHeight: 36 });
         }
 
-        let jugador = new GranDad();
-        let jugador2 = new GranDad();
+        let jugador = new GranDad();    //  Acá creamos el primer jugador
+        let jugador2 = new GranDad();   //  Y aqui el segundo
+
         function create() {
             this.add.image(400, 300, 'sky');
-
+            
             platforms = this.physics.add.staticGroup();
             platforms.create(600, 400, 'ground');
             platforms.create(50, 250, 'ground');
@@ -292,11 +307,12 @@
                 repeat: -1
             });
 
-            cursors = this.input.keyboard.createCursorKeys();
+            cursors = this.input.keyboard.createCursorKeys(); //aca creamos los controles del primer jugador
 
-            this.physics.add.collider(jugador.player, platforms);
-            this.physics.add.collider(jugador2.player, platforms);
+            this.physics.add.collider(jugador.player, platforms);   //agrego los colliders con las platforms
+            this.physics.add.collider(jugador2.player, platforms);  //agrego los colliders con las platforms
 
+            //aca creamos los controles del segundo jugador
             w = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
             a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
             s = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -305,23 +321,30 @@
 
         }
         function update() {
-            jugador.corrizq(cursors.left.isDown, jugador.player.body.touching.down);
-            jugador.corrder(cursors.right.isDown, jugador.player.body.touching.down);
-            jugador.saltar(cursors.up.isDown, jugador.player.body.touching.down);
-            jugador.idle(cursors.left.isDown, cursors.right.isDown, cursors.space.isDown, jugador.player.body.touching.down);
-            jugador.golpe(jugador.player.body.touching.down, cursors.space.isDown);
-            jugador2.corrizq(a.isDown, jugador2.player.body.touching.down);
-            jugador2.corrder(d.isDown, jugador2.player.body.touching.down);
-            jugador2.saltar(w.isDown, jugador2.player.body.touching.down);
-            jugador2.idle(d.isDown, a.isDown, j.isDown, jugador2.player.body.touching.down);
-            jugador2.golpe(jugador2.player.body.touching.down, j.isDown);
+
+            //ejecutamos todas las funciones en el primer jugador
+            jugador.corrizq(cursors.left.isDown);
+            jugador.corrder(cursors.right.isDown);
+            jugador.idle(cursors.left.isDown, cursors.right.isDown, cursors.space.isDown);
+            jugador.golpe(cursors.space.isDown);
+            jugador.saltar(cursors.up.isDown);
+
+            //ejecutamos todas las funciones en el segundo jugador
+            jugador2.corrizq(a.isDown);
+            jugador2.corrder(d.isDown);
+            jugador2.saltar(w.isDown);
+            jugador2.idle(d.isDown, a.isDown, j.isDown);
+            jugador2.golpe(j.isDown);
+
             if (h) {
                 simba.anims.play('twerk');
                 loli.anims.play('spin');
                 h = false;
             }
+
         }
     </script>
 
 </body>
+
 </html>
